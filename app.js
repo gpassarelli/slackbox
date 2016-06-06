@@ -75,6 +75,7 @@ app.post('/store', function(req, res) {
               if(process.env.SLACK_INCOMING_WEBHOOK) {
                 spotifyApi.getTrack(track.id).then(function(trackData){
                   var album = trackData.body.album;
+                  console.log(album.images[0].url)
                   request({
                     url: process.env.SLACK_INCOMING_WEBHOOK,
                     method: "POST",
