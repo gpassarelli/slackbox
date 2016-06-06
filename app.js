@@ -74,17 +74,33 @@ app.post('/store', function(req, res) {
             .then(function(data) {
               if(process.env.SLACK_INCOMING_WEBHOOK) {
                 spotifyApi.getTrack(track.id).then(function(trackData){
+                  var album = trackData.body.album;
                   request({
                     url: process.env.SLACK_INCOMING_WEBHOOK,
                     method: "POST",
                     json: true,
                     body: {
-                      "title": "Radio DMI",
-                      "title_link": trackData.external_urls.spotify,
-                      "fallback": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist.",
-                      "text": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist.",
-                      "color": "#7CD197"
-                    }     
+                        "color": "#7CD197"
+                        "title": "Radio DMI",
+                        "fallback": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist.",
+                        "text": "A new song was added to the playlist.",
+                        "attachments": {
+                          "thumb_url": album.images[3].url,
+                        }
+                        // Fields are displayed in a table on the message
+                        "fields": [
+                          {
+                              "title": "Song",
+                              "value": track.name,
+                              "short": true
+                          },
+                          {
+                              "title": "Artist",
+                              "value": track.artists[0].name,
+                              "short": true
+                          }
+                        ]
+                      }     
                   });
                 });
               }
