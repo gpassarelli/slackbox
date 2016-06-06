@@ -75,7 +75,7 @@ app.post('/store', function(req, res) {
               if(process.env.SLACK_INCOMING_WEBHOOK) {
                 spotifyApi.getTrack(track.id).then(function(trackData){
                   var album = trackData.body.album;
-                  console.log(album.images[0].url)
+                  console.log(album.images[2].url)
                   request({
                     url: process.env.SLACK_INCOMING_WEBHOOK,
                     method: "POST",
@@ -84,7 +84,8 @@ app.post('/store', function(req, res) {
                         "title": "Radio DMI",
                         "fallback": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist.",
                         "text": "A new song was added to the playlist.",
-                        "thumb_url": album.images[0].url,
+                        "thumb_url": album.images[2].url,
+                        "image_url": album.images[0].url,
                         // Fields are displayed in a table on the message
                         "fields": [
                           {
