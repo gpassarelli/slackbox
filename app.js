@@ -83,7 +83,7 @@ app.post('/store', function(req, res) {
                         "color": "#7CD197",
                         "title": "Radio DMI",
                         "fallback": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist.",
-                        "text": "A new song was added to the playlist.",
+                        "text": "A new song was added to the playlist: " + trackData.external_urls.spotify,
                         // Fields are displayed in a table on the message
                         "fields": [
                           {
