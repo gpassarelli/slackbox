@@ -80,7 +80,7 @@ app.post('/store', function(req, res) {
                     method: "POST",
                     json: true,
                     body: {
-                        "color": "#7CD197"
+                        "color": "#7CD197",
                         "title": "Radio DMI",
                         "fallback": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist.",
                         "text": "A new song was added to the playlist.",
