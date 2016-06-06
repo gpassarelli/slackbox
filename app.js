@@ -12,14 +12,6 @@ var spotifyApi = new SpotifyWebApi({
   redirectUri  : process.env.SPOTIFY_REDIRECT_URI
 });
 
-function slack(res, message) {
-  if (process.env.SLACK_OUTGOING) {
-    return res.send(JSON.stringify({text: message}));
-  } else {
-    return res.send(message);
-  }
-}
-
 var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -53,7 +45,7 @@ app.get('/callback', function(req, res) {
 
 app.use('/store', function(req, res, next) {
   if (req.body.token !== process.env.SLACK_TOKEN) {
-    return slack(res.status(500), 'Cross site request forgerizzle!');
+    return res.status(500).send('Cross site request forgerizzle!');
   }
   next();
 });
@@ -70,27 +62,28 @@ app.post('/store', function(req, res) {
         var query = 'track:' + text;
       } else {
         var pieces = text.split(' - ');
-        var query = 'artist:' + pieces[0].trim() + ' track:' + pieces[1].trim();
       }
       spotifyApi.searchTracks(query)
         .then(function(data) {
           var results = data.body.tracks.items;
           if (results.length === 0) {
-            return slack(res, 'Could not find that track.');
+            return res.send('Could not find that track.');
           }
           var track = results[0];
           spotifyApi.addTracksToPlaylist(process.env.SPOTIFY_USERNAME, process.env.SPOTIFY_PLAYLIST_ID, ['spotify:track:' + track.id])
             .then(function(data) {
-              var message = 'Track added' + (process.env.SLACK_OUTGOING ? ' by *' + req.body.user_name + '*' : '') + ': *' + track.name + '* by *' + track.artists[0].name + '*'
-              return slack(res, message);
+              return res.send({
+                "response_type": "ephemeral",
+                "text": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist."
+              });
             }, function(err) {
-              return slack(res, err.message);
+              return res.send(err.message);
             });
         }, function(err) {
-          return slack(res, err.message);
+          return res.send(err.message);
         });
     }, function(err) {
-      return slack(res, 'Could not refresh access token. You probably need to re-authorise yourself from your app\'s homepage.');
+      return res.send('Could not refresh access token. You probably need to re-authorise yourself from your app\'s homepage.');
     });
 });
 
