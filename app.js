@@ -73,15 +73,16 @@ app.post('/store', function(req, res) {
           spotifyApi.addTracksToPlaylist(process.env.SPOTIFY_USERNAME, process.env.SPOTIFY_PLAYLIST_ID, ['spotify:track:' + track.id])
             .then(function(data) {
               if(process.env.SLACK_INCOMING_WEBHOOK) {
-                var trackData = spotifyApi.getTrack(track.id);
-                console.log(trackData);
-                request({
-                  url: process.env.SLACK_INCOMING_WEBHOOK,
-                  method: 'POST',
-                  json: true,
-                  body: {
-                    "text": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist."
-                  }
+                spotifyApi.getTrack(track.id).then(function(trackData){
+                  console.log(trackData);
+                  // request({
+                  //   url: process.env.SLACK_INCOMING_WEBHOOK,
+                  //   method: 'POST',
+                  //   json: true,
+                  //   body: {
+                  //     "text": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist."
+                  //   }
+                  // });
                 });
               }
               return res.send({
