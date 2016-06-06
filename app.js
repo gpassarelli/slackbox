@@ -72,11 +72,14 @@ app.post('/store', function(req, res) {
           var track = results[0];
           spotifyApi.addTracksToPlaylist(process.env.SPOTIFY_USERNAME, process.env.SPOTIFY_PLAYLIST_ID, ['spotify:track:' + track.id])
             .then(function(data) {
+              console.log(track);
               request({
                 url: 'https://hooks.slack.com/services/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',
                 method: 'POST',
                 json: true,
-                body: "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist."
+                body: {
+                  "text": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist."
+                }
               });
               return res.send({
                 "response_type": "ephemeral",
