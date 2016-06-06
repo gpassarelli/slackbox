@@ -80,7 +80,6 @@ app.post('/store', function(req, res) {
                     method: 'POST',
                     json: true,
                     body: {
-                      {
                         "title": "Radio DMI",
                         "fallback": "text": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist.",
                         "text": "A new song was added to the playlist.",
@@ -99,7 +98,6 @@ app.post('/store', function(req, res) {
                           }
                         ]
                       }     
-                    }
                   });
                 });
               }
