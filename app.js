@@ -57,11 +57,11 @@ app.post('/store', function(req, res) {
       if (data.body['refresh_token']) { 
         spotifyApi.setRefreshToken(data.body['refresh_token']);
       }
-      if(req.body.text.indexOf(' - ') === -1) {
-        var query = 'track:' + req.body.text;
-      } else { 
-        var pieces = req.body.text.split(' - ');
-        var query = 'artist:' + pieces[0].trim() + ' track:' + pieces[1].trim();
+      var text = process.env.SLACK_OUTGOING ? req.body.text.replace(req.body.trigger_word, '') : req.body.text;
+      if(text.indexOf(' - ') === -1) {
+        var query = 'track:' + text;
+      } else {
+        var pieces = text.split(' - ');
       }
       spotifyApi.searchTracks(query)
         .then(function(data) {
