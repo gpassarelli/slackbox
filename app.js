@@ -77,11 +77,11 @@ app.post('/store', function(req, res) {
                   var album = trackData.body.album;
                   request({
                     url: process.env.SLACK_INCOMING_WEBHOOK,
-                    method: 'POST',
+                    method: "POST",
                     json: true,
                     body: {
                         "title": "Radio DMI",
-                        "fallback": "text": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist.",
+                        "fallback": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist.",
                         "text": "A new song was added to the playlist.",
                         "thumb_url": album.images[0].url,
                         // Fields are displayed in a table on the message
