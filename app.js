@@ -84,9 +84,9 @@ app.post('/store', function(req, res) {
                         "title": "Radio DMI",
                         "fallback": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist.",
                         "text": "A new song was added to the playlist.",
-                        "attachments": {
-                          "thumb_url": album.images[3].url,
-                        }
+                        "attachments": [{
+                          "thumb_url": album.images[3].url
+                        }],
                         // Fields are displayed in a table on the message
                         "fields": [
                           {
