@@ -72,7 +72,7 @@ app.post('/store', function(req, res) {
           var track = results[0];
           spotifyApi.addTracksToPlaylist(process.env.SPOTIFY_USERNAME, process.env.SPOTIFY_PLAYLIST_ID, ['spotify:track:' + track.id])
             .then(function(data) {
-              if(process.env.SLACK_INCOMING_WEBHOOK)
+              if(process.env.SLACK_INCOMING_WEBHOOK) {
                 request({
                   url: process.env.SLACK_INCOMING_WEBHOOK,
                   method: 'POST',
