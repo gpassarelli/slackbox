@@ -15,6 +15,9 @@ During setup, have your slash command submit a POST to your app's `/store` endpo
 
 Make a note of the `token`, as you'll need it later to help guard against cross-site request forgery.
 
+###Slack
+If you want to post to a specific channel when a new song is added to the playlist, create a incoming webhook on slack [here](https://my.slack.com/services/new/incoming-webhook/).
+
 ###Spotify
 
 Head over to [Spotify's Developer Site](http://developer.spotify.com) and create a new Application. Make sure you add whatever slackbox's callback URI as a valid callback URI. If you're running locally, this will be `http://localhost:5000/callback` or on Heroku `https://app-name.herokuapp.com/callback`
@@ -28,6 +31,7 @@ Also, don't forget to make a playlist. If you do this through [Spotify's web int
 Once you've cloned slackbox or hit the "Deploy with Heroku" button you'll need to setup the following environment variables. These can either be stored in a `.env` or set up as config variables in Heroku.
 
 * `SLACK_TOKEN` - The token from Slack's Slash Command.
+* `SLACK_INCOMING_WEBHOOK` - The incoming webhook to post when a new song is added to the playlist. _(optional)_
 * `SPOTIFY_KEY` - Your Spotify application key (a.k.a Client ID).
 * `SPOTIFY_SECRET` - Your Spotify application secret (a.k.a Client Secret).
 * `SPOTIFY_USERNAME` - Your Spotify username.
