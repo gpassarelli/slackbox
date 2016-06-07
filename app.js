@@ -84,19 +84,6 @@ app.post('/store', function(req, res) {
                         "title": "Radio DMI",
                         "fallback": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist.",
                         "text": "A new song was added to the playlist: " + trackData.body.external_urls.spotify,
-                        // Fields are displayed in a table on the message
-                        "fields": [
-                          {
-                              "title": "Song",
-                              "value": track.name,
-                              "short": true
-                          },
-                          {
-                              "title": "Artist",
-                              "value": track.artists[0].name,
-                              "short": true
-                          }
-                        ]
                       }     
                   });
                 });
