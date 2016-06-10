@@ -34,13 +34,13 @@ app.get('/authorise', function(req, res) {
 
 app.get('/callback', function(req, res) {
   spotifyApi.authorizationCodeGrant(req.query.code)
-    .then(function(data) {
-      spotifyApi.setAccessToken(data.body['access_token']);
-      spotifyApi.setRefreshToken(data.body['refresh_token']);
-      return res.redirect('/');
-    }, function(err) {
-      return res.send(err);
-    });
+  .then(function(data) {
+    spotifyApi.setAccessToken(data.body['access_token']);
+    spotifyApi.setRefreshToken(data.body['refresh_token']);
+    return res.redirect('/');
+  }, function(err) {
+    return res.send(err);
+  });
 });
 
 app.use('/store', function(req, res, next) {
@@ -52,56 +52,102 @@ app.use('/store', function(req, res, next) {
 
 app.post('/store', function(req, res) {
   spotifyApi.refreshAccessToken()
+  .then(function(data) {
+    spotifyApi.setAccessToken(data.body['access_token']);
+    if (data.body['refresh_token']) {
+      spotifyApi.setRefreshToken(data.body['refresh_token']);
+    }
+    var text = process.env.SLACK_OUTGOING ? req.body.text.replace(req.body.trigger_word, '') : req.body.text;
+    if(text.indexOf(' - ') === -1) {
+      var query = 'track:' + text;
+    } else {
+      var pieces = text.split(' - ');
+    }
+    spotifyApi.searchTracks(query)
     .then(function(data) {
-      spotifyApi.setAccessToken(data.body['access_token']);
-      if (data.body['refresh_token']) { 
-        spotifyApi.setRefreshToken(data.body['refresh_token']);
+      var results = data.body.tracks.items;
+      if (results.length === 0) {
+        return res.send('Could not find that track.');
       }
-      var text = process.env.SLACK_OUTGOING ? req.body.text.replace(req.body.trigger_word, '') : req.body.text;
-      if(text.indexOf(' - ') === -1) {
-        var query = 'track:' + text;
-      } else {
-        var pieces = text.split(' - ');
-      }
-      spotifyApi.searchTracks(query)
-        .then(function(data) {
-          var results = data.body.tracks.items;
-          if (results.length === 0) {
-            return res.send('Could not find that track.');
-          }
-          var track = results[0];
-          spotifyApi.addTracksToPlaylist(process.env.SPOTIFY_USERNAME, process.env.SPOTIFY_PLAYLIST_ID, ['spotify:track:' + track.id])
-            .then(function(data) {
-              if(process.env.SLACK_INCOMING_WEBHOOK) {
-                spotifyApi.getTrack(track.id).then(function(trackData){
-                  var album = trackData.body.album;
-                  request({
-                    url: process.env.SLACK_INCOMING_WEBHOOK,
-                    method: "POST",
-                    json: true,
-                    body: {
-                        "color": "#7CD197",
-                        "title": "Radio DMI",
-                        "fallback": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist.",
-                        "text": "A new song was added to the playlist: " + trackData.body.external_urls.spotify,
-                      }     
-                  });
-                });
+      var track = results[0];
+      spotifyApi.addTracksToPlaylist(process.env.SPOTIFY_USERNAME, process.env.SPOTIFY_PLAYLIST_ID, ['spotify:track:' + track.id])
+      .then(function(data) {
+        if(process.env.SLACK_INCOMING_WEBHOOK) {
+          spotifyApi.getTrack(track.id).then(function(trackData){
+            var album = trackData.body.album;
+            request({
+              url: process.env.SLACK_INCOMING_WEBHOOK,
+              method: "POST",
+              json: true,
+              body: {
+                "color": "#7CD197",
+                "title": "Radio DMI",
+                "fallback": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist.",
+                "text": "A new song was added to the playlist: " + trackData.body.external_urls.spotify,
               }
-              return res.send({
-                "response_type": "ephemeral",
-                "text": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist."
-              });
-            }, function(err) {
-              return res.send(err.message);
             });
-        }, function(err) {
-          return res.send(err.message);
+          });
+        }
+        return res.send({
+          "response_type": "ephemeral",
+          "text": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist."
         });
+      }, function(err) {
+        return res.send(err.message);
+      });
     }, function(err) {
-      return res.send('Could not refresh access token. You probably need to re-authorise yourself from your app\'s homepage.');
+      return res.send(err.message);
     });
+  }, function(err) {
+    return res.send('Could not refresh access token. You probably need to re-authorise yourself from your app\'s homepage.');
+  });
 });
+
+
+app.post('/refresh_token', function(req, res) {
+  spotifyApi.refreshAccessToken()
+  .then(function(data) {
+    spotifyApi.setAccessToken(data.body['access_token']);
+    if (data.body['refresh_token']) {
+      spotifyApi.setRefreshToken(data.body['refresh_token']);
+    }
+  }, function(err) {
+    return res.send('Could not refresh access token. You probably need to re-authorise yourself from your app\'s homepage.');
+  });
+});
+
+app.delete('/clean_playlist', function(req, res) {
+  spotifyApi.refreshAccessToken()
+  .then(function(data) {
+    spotifyApi.setAccessToken(data.body['access_token']);
+    if (data.body['refresh_token']) {
+      spotifyApi.setRefreshToken(data.body['refresh_token']);
+    }
+    spotifyApi.removeTracksFromPlaylist(process.env.SPOTIFY_USERNAME, process.env.SPOTIFY_PLAYLIST_ID)
+      .then(function(data) {
+        return res.send('Playlist was cleaned, you are all set to start again.');
+      }, function(err) {
+      return res.send(err.message);
+    }
+  }, function(err) {
+    return res.send('Could not refresh access token. You probably need to re-authorise yourself from your app\'s homepage.');
+  });
+});
+
+var keepTokenActive = setInterval(function(){
+  request({
+      url: "/refresh_token",
+      method: "POST",
+      timeout: 10000,
+  },function(error, response, body){
+      if(!error && response.statusCode == 200){
+          console.log('sucess!');
+      }else{
+          console.log('error' + response.statusCode);
+      }
+  });
+}, 60000);
+
 
 app.set('port', (process.env.PORT || 5000));
 app.listen(app.get('port'));
