@@ -82,7 +82,7 @@ app.post('/store', function(req, res) {
               "color": "#23CF5F",
               "title": process.env.APP_NAME,
               "fallback": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist.",
-              "text": ":notes: "*" + track.name + "* by *" + track.artists[0].name + "* was added to thep laylist.\n" + track.external_urls.spotify,
+              "text": ":notes: *" + track.name + "* by *" + track.artists[0].name + "* was added to thep laylist.\n" + track.external_urls.spotify,
             }
           });
         }
