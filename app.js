@@ -128,7 +128,7 @@ app.delete('/clean_playlist', function(req, res) {
         return res.send('Playlist was cleaned, you are all set to start again.');
       }, function(err) {
       return res.send(err.message);
-    }
+    });
   }, function(err) {
     return res.send('Could not refresh access token. You probably need to re-authorise yourself from your app\'s homepage.');
   });
