@@ -116,7 +116,7 @@ app.post('/refresh_token', function(req, res) {
   });
 });
 
-app.delete('/clean_playlist', function(req, res) {
+app.post('/clean_playlist', function(req, res) {
   spotifyApi.refreshAccessToken()
   .then(function(data) {
     spotifyApi.setAccessToken(data.body['access_token']);
@@ -124,9 +124,9 @@ app.delete('/clean_playlist', function(req, res) {
       spotifyApi.setRefreshToken(data.body['refresh_token']);
     }
     spotifyApi.removeTracksFromPlaylist(process.env.SPOTIFY_USERNAME, process.env.SPOTIFY_PLAYLIST_ID)
-      .then(function(data) {
-        return res.send('Playlist was cleaned, you are all set to start again.');
-      }, function(err) {
+    .then(function(data) {
+      return res.send('Playlist was cleaned, you are all set to start again.');
+    }, function(err) {
       return res.send(err.message);
     });
   }, function(err) {
