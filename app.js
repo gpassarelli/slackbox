@@ -125,7 +125,13 @@ app.post('/clean_playlist', function(req, res) {
     }
     spotifyApi.getPlaylistTracks(process.env.SPOTIFY_USERNAME, process.env.SPOTIFY_PLAYLIST_ID)
     .then(function(data) {
-      return res.send(data);
+      var tracks = data.body.items;
+        spotifyApi.removeTracksFromPlaylist(process.env.SPOTIFY_USERNAME, process.env.SPOTIFY_PLAYLIST_ID, tracks)
+        .then(function(data){
+          return res.send('Playlist was cleaned, you are all set to start again.');
+        }, function(err) {
+          return res.send(err.message);
+        });
     }, function(err) {
       return res.send(err.message);
     });
