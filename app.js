@@ -104,19 +104,6 @@ app.post('/store', function(req, res) {
   });
 });
 
-
-app.post('/refresh_token', function(req, res) {
-  spotifyApi.refreshAccessToken()
-  .then(function(data) {
-    spotifyApi.setAccessToken(data.body['access_token']);
-    if (data.body['refresh_token']) {
-      spotifyApi.setRefreshToken(data.body['refresh_token']);
-    }
-  }, function(err) {
-    return res.send('Could not refresh access token. You probably need to re-authorise yourself from your app\'s homepage.');
-  });
-});
-
 app.delete('/empty_playlist', function(req, res) {
   spotifyApi.refreshAccessToken()
   .then(function(data) {
@@ -143,21 +130,6 @@ app.delete('/empty_playlist', function(req, res) {
     return res.send('Could not refresh access token. You probably need to re-authorise yourself from your app\'s homepage.');
   });
 });
-
-var keepTokenActive = setInterval(function(){
-  request({
-      url: "/refresh_token",
-      method: "POST",
-      timeout: 10000,
-  },function(error, response, body){
-      if(!error && response.statusCode == 200){
-          console.log('sucess!');
-      }else{
-          console.log('error' + response.statusCode);
-      }
-  });
-}, 60000);
-
 
 app.set('port', (process.env.PORT || 5000));
 app.listen(app.get('port'));
