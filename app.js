@@ -123,7 +123,7 @@ app.post('/clean_playlist', function(req, res) {
     if (data.body['refresh_token']) {
       spotifyApi.setRefreshToken(data.body['refresh_token']);
     }
-    spotifyApi.removeTracksFromPlaylist(process.env.SPOTIFY_USERNAME, process.env.SPOTIFY_PLAYLIST_ID,{[0,9999]})
+    spotifyApi.removeTracksFromPlaylist(process.env.SPOTIFY_USERNAME, process.env.SPOTIFY_PLAYLIST_ID,{positions : [0,9999]})
     .then(function(data) {
       return res.send('Playlist was cleaned, you are all set to start again.');
     }, function(err) {
