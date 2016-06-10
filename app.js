@@ -75,14 +75,14 @@ app.post('/store', function(req, res) {
       .then(function(data) {
         if(process.env.SLACK_INCOMING_WEBHOOK) {
           request({
-            url: process.env.SLACK_INCOMING_WEBHOOK,
-            method: "POST",
-            json: true,
-            body: {
-              color: "#23CF5F",
-              title: process.env.APP_NAME,
-              fallback: "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist.",
-              text: ":notes: "*" + track.name + "* by *" + track.artists[0].name + "* was added to the playlist.\n" + track.external_urls.spotify,
+            "url": process.env.SLACK_INCOMING_WEBHOOK,
+            "method": "POST",
+            "json": true,
+            "body": {
+              "color": "#23CF5F",
+              "title": process.env.APP_NAME,
+              "fallback": "Added *" + track.name + "* by *" + track.artists[0].name + "* to the playlist.",
+              "text": ":notes: "*" + track.name + "* by *" + track.artists[0].name + "* was added to thep laylist.\n" + track.external_urls.spotify,
             }
           });
         }
