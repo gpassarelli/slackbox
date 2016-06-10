@@ -125,12 +125,16 @@ app.post('/clean_playlist', function(req, res) {
     }
     spotifyApi.getPlaylistTracks(process.env.SPOTIFY_USERNAME, process.env.SPOTIFY_PLAYLIST_ID)
     .then(function(data) {
-      var tracks = data.body.items;
+      var tracks = data.body.items,
+          tracks_2_remove = [];
       for (var i = 0, len = tracks.length; i < len; i++) {
-        var current_track = tracks[i];
-        var remove_log = spotifyApi.removeTracksFromPlaylist(process.env.SPOTIFY_USERNAME, process.env.SPOTIFY_PLAYLIST_ID, [{uri: current_track.track.uri}])
-        return res.send(remove_log);
+        tracks_2_remove.push({
+            uri: tracks[i].track.uri
+        });
       }
+        console.log(tracks_2_remove);
+        var remove_log = spotifyApi.removeTracksFromPlaylist(process.env.SPOTIFY_USERNAME, process.env.SPOTIFY_PLAYLIST_ID, tracks_2_remove)
+        return res.send(remove_log);
 
       return res.send('Playlist was cleaned, you are all set to start again.');
     }, function(err) {
